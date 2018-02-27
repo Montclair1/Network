@@ -13,7 +13,7 @@ def calculate_expression(message):
     lastchar=""
 
     for i in range(len(message)):  # separate and store all terms and operators
-        if((lastchar=="/" or lastchar=="*") and message[i]=="-"):
+        if((lastchar=="" or lastchar=="/" or lastchar=="*" or lastchar=="+" or lastchar=="-") and message[i]=="-"):
             #treat as divided by a negative number
             x=0
         elif(message[i] in operators):
