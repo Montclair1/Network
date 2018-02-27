@@ -1,4 +1,3 @@
-#implementing the server (UDP)
 
 from socket import *
 
@@ -11,9 +10,14 @@ def calculate_expression(message):
     start = 0  # placeholder 
     operators = set("+-*/")
     message = message.replace(" ", "") # take out spaces
+    lastchar=""
 
     for i in range(len(message)):  # separate and store all terms and operators
-        if(message[i] in operators):
+        if((lastchar=="/" or lastchar=="*") and message[i]=="-"):
+            #treat as divided by a negative number
+            x=0
+        elif(message[i] in operators):
+            lastchar=message[i]
             term_list.append(message[start:i])  #add term to term list
             op_list.append(message[i])  #add operator to operator list
             start = i+1
