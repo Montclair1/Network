@@ -59,6 +59,7 @@ serverPort=10000
 serverSocket=socket(AF_INET,SOCK_STREAM)
 serverSocket.bind(('',serverPort))
 serverSocket.listen(1)
+print("Server is ready")
 
 while True:
 	connectionSocket,addr=serverSocket.accept()
