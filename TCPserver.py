@@ -69,15 +69,11 @@ while bool_value:
 
 	message=connectionSocket.recv(1024).decode()
 	message=message.replace(" ","")
-
-	if(message == "Q"):
-		connectionSocket.close()
-		bool_value = False
-
-
-	else:
-		solved=str(calculate_expression(message))
-		connectionSocket.send(solved.encode())
+	solved=str(calculate_expression(message))
+	connectionSocket.send(solved.encode())
 	
+	#close the connection where there are no more requests
+	if not message: break
+connection.close()
 
 

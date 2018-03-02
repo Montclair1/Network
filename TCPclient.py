@@ -4,7 +4,7 @@ from socket import *
 
 # ____________________Function Defenitions______________________________
 
-#Thif function let's the user enter a mathematical expression 
+#This function let's the user enter a mathematical expression 
 def enter_expression():
 	print()
 	expression = input("Math expression ---> ")
