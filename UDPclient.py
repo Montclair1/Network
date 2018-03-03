@@ -1,10 +1,13 @@
 import socket 
 
+# UDPclient.py
 
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # AF_INET specifies IPv4
+server_address = ('localhost', 10000) # (serverName,serverPort)
 
-# ____________________Function Defenitions______________________________
+# ____________________Function Definitions______________________________
 
-#Thif function let's the user enter a mathematical expression 
+#This function lets the user enter a mathematical expression 
 def enter_expression():
 	print()
 	expression = input("Math expression ---> ")
@@ -12,25 +15,22 @@ def enter_expression():
 
 #This function sends a message to the servers (request)
 def send_message(message):
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    server_address = ('localhost', 10000)
-
     #send the  expression to server for calculation
-    sent = sock.sendto(message.encode(), server_address)
+    sock.sendto(message.encode(), server_address)  # this was tied to an unused variable sent, I deleted) -TK
     
     #receive a response from server
-    message, server = sock.recvfrom(4096)
+    message, server = sock.recvfrom(4096)  # server = unused variable??
     print()
     print("Response from server:  ", message.decode())
     print()
-
+        
 def check_type(entry):
     if(type(entry) == int):
         return True 
     else:
         return False
 
-#Display a menu 
+#Display menu 
 def menu():
     print("1.Enter a math expression")
     print("2.Exit")
@@ -38,44 +38,29 @@ def menu():
     while True:
         try:
             choice = int(input('Choose a menu option --->'))
-            return choice 
-            break
-        except:
+            while(choice<1 or choice>2):  # loop until user meets input parameters
+                print()
+                print("That's not a valid option!")
+                print()
+                choice = int(input('Choose a menu option --->'))
+                print()
+            return choice
+        except:         # catch input exception
             print()
             print("That's not a valid option!")
-        
+            print()
         
 
 #________________________________________________________________________
 
-
 user_choice = menu()   #Allow user to make a choice 
-while(user_choice < 1 or user_choice > 2):  #If there is a wrong entry display a message indicating that
-    print()
-    print("That's not a valid option!")
-    print()
-    user_choice = menu()
-
 
 while(user_choice == 1 ):  #Let user enter a mathematical expression 
     message = enter_expression()
     send_message(message)
     user_choice = menu()
     
-    while(user_choice < 1 or user_choice > 2):  #If there is a wrong entry display a message indicating that 
-        print()
-        print("That's not a valid option")
-        print()
-        user_choice = menu()
-
 if(user_choice == 2): #if the user prefers to exit out, display a goodbye message
     print()
     print("Goodbye....!!!")
-    
-
-  
-    
-
-	
-
-
+    sock.close()  # close socket if user terminates program
