@@ -10,6 +10,7 @@ def calculate_expression(message):
     start = 0  # placeholder 
     operators = set("+-*/")
     message = message.replace(" ", "") # take out spaces
+    negative = 1.0 # multiplier for negative values
 
     if (message[0]=="-"):   # check if first term negative
         negative=-1.0
@@ -84,5 +85,5 @@ while True:
     finally:                
 	#close the connection where there are no more requests
         print("Closing server connection")
-        connectionSocket.close()
-        exit(0)
+        #connectionSocket.close()
+        #exit(0)

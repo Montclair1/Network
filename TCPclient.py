@@ -17,7 +17,7 @@ clientSocket.connect((serverName,serverPort))
 #This function sends a message to the servers (request)
 def send_message(message):
     clientSocket.send(message.encode())
-    modifiedMessage=clientSocket.recv(2048) #message length
+    modifiedMessage=clientSocket.recv(4096) #message length
     print (modifiedMessage.decode())
     print()
     #clientSocket.close()
