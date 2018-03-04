@@ -11,13 +11,27 @@ def calculate_expression(message):
     operators = set("+-*/")
     message = message.replace(" ", "") # take out spaces
 
+    if (message[0]=="-"):   # check if first term negative
+        negative=-1.0
+        message = message[1:]  # delete negative sign from message
     for i in range(len(message)):  # separate and store all terms and operators
-        if(message[i] in operators):
-            term_list.append(message[start:i])  #add term to term list
+        if i == len(message)-1:     # if last digit reached, store last term
+            term_list.append(negative*float(message[start:]))
+            break
+        if(message[i] in operators and message[i+1]=="-"):  # if next term negative
+            term_list.append(negative*float(message[start:i]))  #add term to term list
             op_list.append(message[i])  #add operator to operator list
-            start = i+1
-        if i == len(message)-1:     # store last term
-            term_list.append(message[start:])          
+            messageList = list(message)  # replace negative with '0' so it is not operator in next iteration
+            messageList[i+1]='0'  
+            message="".join(messageList)
+            start = i+1  # increment placeholder
+            negative = -1.0  # next term is negative
+            continue
+        elif(message[i] in operators):  # if next term positive
+            term_list.append(negative*float(message[start:i]))  #add term to term list
+            op_list.append(message[i])  #add operator to operator list
+            start = i+1     # increment placeholder     
+            negative = 1.0  # next term is positive        
 
     # Multiplication Calculations
     for i in range(len(op_list)):
