@@ -1,5 +1,6 @@
 from socket import *
 
+# TCPserver.py
 
 #This function calculates the math expressions received from the clients
 def calculate_expression(message):
@@ -9,21 +10,16 @@ def calculate_expression(message):
     start = 0  # placeholder 
     operators = set("+-*/")
     message = message.replace(" ", "") # take out spaces
-    lastchar=""
 
     for i in range(len(message)):  # separate and store all terms and operators
-        if((lastchar=="" or lastchar=="/" or lastchar=="*" or lastchar=="+" or lastchar=="-") and message[i]=="-"):
-            #treat as divided by a negative number
-            x=0
-        elif(message[i] in operators):
-            lastchar=message[i]
+        if(message[i] in operators):
             term_list.append(message[start:i])  #add term to term list
             op_list.append(message[i])  #add operator to operator list
             start = i+1
         if i == len(message)-1:     # store last term
             term_list.append(message[start:])          
 
-    # Multiplation Calculations
+    # Multiplication Calculations
     for i in range(len(op_list)):
         if op_list[i] == '*':
             term_list[i+1]=float(term_list[i])*float(term_list[i+1])
@@ -53,27 +49,26 @@ def calculate_expression(message):
             term_list[i+1]=float(term_list[i])-float(term_list[i+1])
     final_result = term_list[-1]
         
-    return final_result
+    return final_result 
 
 serverPort=10000
 serverSocket=socket(AF_INET,SOCK_STREAM)
-serverSocket.bind(('',serverPort))
-serverSocket.listen(1)
+serverSocket.bind(('',serverPort)) # bind socket to server address
+serverSocket.listen(1)  # listen for incoming connections
 print("Server is ready")
-
-bool_value = True
-
-
-while bool_value:
-	connectionSocket,addr=serverSocket.accept()
-
-	message=connectionSocket.recv(1024).decode()
-	message=message.replace(" ","")
-	solved=str(calculate_expression(message))
-	connectionSocket.send(solved.encode())
-	
+#connectionSocket,address=serverSocket.accept()
+while True:
+    connectionSocket,address=serverSocket.accept() # should this be outside loop so we can close connection at end?
+    try:
+        while True:
+            message = connectionSocket.recv(4096).decode()
+            if message:  # if message exists, calculate expression
+                message_displayed=calculate_expression(message)
+                connectionSocket.sendto(repr(message_displayed).encode(),address)    
+            else:
+                break
+    finally:                
 	#close the connection where there are no more requests
-	if not message: break
-connection.close()
-
-
+        print("Closing server connection")
+        connectionSocket.close()
+        exit(0)
