@@ -2,6 +2,30 @@
 
 from socket import *
 
+# method for parsing any number of parentheses in any order
+# NOT INCLUDED : exception if wrong # of parentheses entered by user
+def calc_expr_par(input):
+    par_list_open = []  # list of elements with "("
+    calc ="" # substring for calculating inner parenthetical expression
+    result=""
+    count=input.count('(')  # count number of opening parentheses in expression
+    while (count>0): # loop until all parenthetical expressions eliminated (count =0)
+        par_incrementer=0  # variable for referencing opening parentheses
+        for j in range(len(input)):
+            if input[j] == "(":
+                par_list_open.append(j)
+                par_incrementer+=1
+            elif input[j] == ")":
+                count-=1
+                par_incrementer-=1
+                start = par_list_open[-1] # element with last "("
+                parExpr = input[start:j+1] # full expression including parentheses
+                expr=input[start+1:j] # expression within parentheses
+                calc=str(calculate_expression(expr)) # calculate value inner parentheses
+                result=input.replace(parExpr,calc) # replace inner parentheses with calculated value
+                input=result
+                break
+    return calculate_expression(input)  # all parentheses eliminated, calculate final expression     
 
 #This function calculates the math expressions received from the clients
 def calculate_expression(message):
@@ -77,5 +101,5 @@ print("Server is up and running")
 
 while True:
 	message, address = serverSocket.recvfrom(4096)
-	message_displayed = calculate_expression(message.decode())
+	message_displayed = calc_expr_par(message.decode())  # evaluate parentheses first
 	serverSocket.sendto(repr(message_displayed).encode(), address)
