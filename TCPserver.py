@@ -2,6 +2,33 @@ from socket import *
 
 # TCPserver.py
 
+# method for parsing any number of parentheses in any order
+# NOT INCLUDED : exception if wrong # of parentheses entered by user
+def calc_expr_par(input):
+    par_list_open = []  # list of elements with "("
+    calc ="" # substring for calculating inner parenthetical expression
+    result=""
+    count=input.count('(')  # count number of opening parentheses in expression
+    while (count>0): # loop until all parenthetical expressions eliminated (count =0)
+        par_incrementer=0  # variable for referencing opening parentheses
+        for j in range(len(input)):
+            if input[j] == "(":
+                par_list_open.append(j)
+                par_incrementer+=1
+            elif input[j] == ")":
+                count-=1
+                par_incrementer-=1
+                start = par_list_open[-1] # element with last "("
+                parExpr = input[start:j+1] # full expression including parentheses
+                expr=input[start+1:j] # expression within parentheses
+                calc=str(calculate_expression(expr)) # calculate value inner parentheses
+                result=input.replace(parExpr,calc) # replace inner parentheses with calculated value
+                input=result
+                break
+    return calculate_expression(input)  # all parentheses eliminated, calculate final expression        
+
+
+
 #This function calculates the math expressions received from the clients
 def calculate_expression(message):
     term_list = [] # list of terms 
@@ -66,6 +93,7 @@ def calculate_expression(message):
         
     return final_result 
 
+# Network Connection
 serverPort=10000
 serverSocket=socket(AF_INET,SOCK_STREAM)
 serverSocket.bind(('',serverPort)) # bind socket to server address
@@ -78,12 +106,12 @@ while True:
         while True:
             message = connectionSocket.recv(4096).decode()
             if message:  # if message exists, calculate expression
-                message_displayed=calculate_expression(message)
+                message_displayed=calc_expr_par(message) # evaluate parentheses first
                 connectionSocket.sendto(repr(message_displayed).encode(),address)    
             else:
                 break
     finally:                
 	#close the connection where there are no more requests
         print("Closing server connection")
-        #connectionSocket.close()
-        #exit(0)
+        connectionSocket.close()
+        exit(0)  # works 3/6/18
