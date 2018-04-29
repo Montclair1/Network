@@ -1,6 +1,9 @@
 import socket 
 
 # UDPclient.py
+# CJ Conti
+# Livio Beqiri
+# Thomson Kneeland
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # AF_INET specifies IPv4
 server_address = ('localhost', 10000) # (serverName,serverPort)
@@ -14,8 +17,8 @@ def enter_expression():
 
 #This function sends a message to the servers (request)
 def send_message(message):
-    #send the  expression to server for calculation
-    sock.sendto(message.encode(), server_address)  # this was tied to an unused variable sent, I deleted) -TK
+    #send the expression to server for calculation
+    sock.sendto(message.encode(), server_address)
     
     #receive a response from server
     message, server = sock.recvfrom(4096)  # server = unused variable??
@@ -41,7 +44,6 @@ def menu():
         except:         # catch input exception
             print("That's not a valid option!")
         
-
 #________________________________________________________________________
 
 user_choice = menu()   #Allow user to make a choice 

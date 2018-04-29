@@ -1,9 +1,14 @@
 from socket import *
 
 # TCPserver.py
+# CJ Conti
+# Livio Beqiri
+# Thomson Kneeland
 
+# server performs arithmetic calculations for client request
+# includes whitespace, parentheses, +,-,*,/,^ and negative numbers
+# Singlethreaded version
 # method for parsing any number of parentheses in any order
-# NOT INCLUDED : exception if wrong # of parentheses entered by user
 def calc_expr_par(input):
     par_list_open = []  # list of elements with "("
     calc ="" # substring for calculating inner parenthetical expression
@@ -115,10 +120,9 @@ serverSocket=socket(AF_INET,SOCK_STREAM)
 serverSocket.bind(('',serverPort)) # bind socket to server address
 serverSocket.listen(1)  # listen for incoming connections
 print("Server is ready")
-calc_expr_par("3^3")
-#connectionSocket,address=serverSocket.accept()
 while True:
     connectionSocket,address=serverSocket.accept() # should this be outside loop so we can close connection at end?
+    print("Connected to :", address[0], ":", address[1])
     try:
         while True:
             message = connectionSocket.recv(4096).decode()

@@ -1,6 +1,9 @@
 from socket import *
 
 # TCPclient.py 
+# CJ Conti
+# Livio Beqiri
+# Thomson Kneeland
 
 # ____________________Function Definitions______________________________
 
