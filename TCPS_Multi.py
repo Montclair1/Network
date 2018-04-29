@@ -1,16 +1,52 @@
-#implementing the server (UDP)
-
 from socket import *
+from _thread import*
+import threading
+import sys
 
-# UDPserver.py
+# TCPserverMultithread.py
 # CJ Conti
 # Livio Beqiri
 # Thomson Kneeland
 
-# server performs arithmetic calculations for client request
-# includes whitespace, parentheses, +,-,*,/,^ and negative numbers
+# attempt at a multithreaded version of our TCPserver
+# program performs repeated outputs using new threads, however, does not exit
+# properly, loose threads remain preventing server close
+
+# prevent thread from being accessed
+print_lock = threading.Lock()
+ 
+# thread fuction
+def threaded(connectionSocket):
+    while True:  # data received from TCPclient
+        message = connectionSocket.recv(4096).decode()
+        if not message:
+            #print_lock.release()
+            #print("print lock release")
+            break    
+        if message:  # if message exists, calculate expression
+            #print_lock.acquire()
+            print("Incoming message")
+            thread_id=threading.get_ident()
+            print("thread_id is:",thread_id)
+            message_displayed=calc_expr_par(message) # evaluate parentheses first
+            connectionSocket.sendto(repr(message_displayed).encode(),address)
+            #print_lock.release() # trial
+            return 0
+        #else:
+        #   print_lock.release()
+        #   print("print lock release")
+        #   break
+ 
+    # connection close
+    print_lock.release()
+    print("closing thread")
+    serverSocket.close()
+    connectionSocket.close() # Close thread
+    #exit()  #alternate exit code
+    sys.exit()  #NOT EXITING
 
 # method for parsing any number of parentheses in any order
+# NOT INCLUDED : exception if wrong # of parentheses entered by user
 def calc_expr_par(input):
     par_list_open = []  # list of elements with "("
     calc ="" # substring for calculating inner parenthetical expression
@@ -34,7 +70,7 @@ def calc_expr_par(input):
                 break
     return calculate_expression(input)  # all parentheses eliminated, calculate final expression        
 
-# Exponential method
+# Method for exponents
 def power(a,b):
     i=0
     result=1
@@ -85,7 +121,7 @@ def calculate_expression(message):
         op_list.remove('^')
     while None in term_list:  # remove nulls
         term_list.remove(None)
-        
+
     # Multiplication Calculations
     for i in range(len(op_list)):
         if op_list[i] == '*':
@@ -115,15 +151,36 @@ def calculate_expression(message):
         if op_list[i] == '-':
             term_list[i+1]=float(term_list[i])-float(term_list[i+1])
     final_result = term_list[-1]
-    return final_result 
         
-#send result back to clients 
-serverSocket = socket(AF_INET, SOCK_DGRAM)
-serverSocket.bind(('', 10000))
-print("Server is up and running")
+    return final_result 
 
+# Network Connection
+serverPort=10000 # port number
+serverSocket=socket(AF_INET,SOCK_STREAM) # AF_INET = ipv4  SOCK_STREAM - connection oriented TCP protocol
+serverSocket.bind(('',serverPort)) # bind socket to server address
+serverSocket.listen(1)  # listen for incoming connections
+print("Server is ready")
 while True:
-	message, address = serverSocket.recvfrom(4096)
-	print("received from :", address[0], ":", address[1])
-	message_displayed = calc_expr_par(message.decode())  # evaluate parentheses first
-	serverSocket.sendto(repr(message_displayed).encode(), address)
+    connectionSocket,address=serverSocket.accept() # should this be outside loop so we can close connection at end?
+    print("Connected to :", address[0], ":", address[1])
+    try:
+        while True:
+            print_lock.acquire() 
+            start_new_thread(threaded, (connectionSocket,))  # create new thread, see method above
+            start_new_thread(threaded, (connectionSocket,))
+            start_new_thread(threaded, (connectionSocket,))
+            #t1=threading.Thread(target=threaded,args=(connectionSocket,))
+            #t2=threading.Thread(target=threaded,args=(connectionSocket,))
+            #t3=threading.Thread(target=threaded,args=(connectionSocket,))
+            #t1.start()
+            #t2.start()
+            #t1.join()
+            #t2.join()
+            
+       
+    finally:                
+	#close the connection where there are no more requests
+        print("Closing server connection")
+        #print_lock.release()  # testing
+        connectionSocket.close()
+        exit()

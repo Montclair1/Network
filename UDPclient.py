@@ -1,6 +1,9 @@
 import socket 
 
 # UDPclient.py
+# CJ Conti
+# Livio Beqiri
+# Thomson Kneeland
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # AF_INET specifies IPv4
 server_address = ('localhost', 10000) # (serverName,serverPort)
@@ -9,20 +12,17 @@ server_address = ('localhost', 10000) # (serverName,serverPort)
 
 #This function lets the user enter a mathematical expression 
 def enter_expression():
-	print()
 	expression = input("Math expression ---> ")
 	return expression 
 
 #This function sends a message to the servers (request)
 def send_message(message):
-    #send the  expression to server for calculation
-    sock.sendto(message.encode(), server_address)  # this was tied to an unused variable sent, I deleted) -TK
+    #send the expression to server for calculation
+    sock.sendto(message.encode(), server_address)
     
     #receive a response from server
     message, server = sock.recvfrom(4096)  # server = unused variable??
-    print()
-    print("Response from server:  ", message.decode())
-    print()
+    print(message.decode())
         
 def check_type(entry):
     if(type(entry) == int):
@@ -34,23 +34,16 @@ def check_type(entry):
 def menu():
     print("1.Enter a math expression")
     print("2.Exit")
-    print()
     while True:
         try:
             choice = int(input('Choose a menu option --->'))
             while(choice<1 or choice>2):  # loop until user meets input parameters
-                print()
                 print("That's not a valid option!")
-                print()
                 choice = int(input('Choose a menu option --->'))
-                print()
             return choice
         except:         # catch input exception
-            print()
             print("That's not a valid option!")
-            print()
         
-
 #________________________________________________________________________
 
 user_choice = menu()   #Allow user to make a choice 
@@ -61,6 +54,5 @@ while(user_choice == 1 ):  #Let user enter a mathematical expression
     user_choice = menu()
     
 if(user_choice == 2): #if the user prefers to exit out, display a goodbye message
-    print()
     print("Goodbye....!!!")
     sock.close()  # close socket if user terminates program

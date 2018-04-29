@@ -1,9 +1,14 @@
 from socket import *
 
 # TCPserver.py
+# CJ Conti
+# Livio Beqiri
+# Thomson Kneeland
 
+# server performs arithmetic calculations for client request
+# includes whitespace, parentheses, +,-,*,/,^ and negative numbers
+# Singlethreaded version
 # method for parsing any number of parentheses in any order
-# NOT INCLUDED : exception if wrong # of parentheses entered by user
 def calc_expr_par(input):
     par_list_open = []  # list of elements with "("
     calc ="" # substring for calculating inner parenthetical expression
@@ -28,6 +33,13 @@ def calc_expr_par(input):
     return calculate_expression(input)  # all parentheses eliminated, calculate final expression        
 
 
+def power(a,b):
+    i=0
+    result=1
+    while(i<b):
+        result=result*a
+        i=i+1
+    return result
 
 #This function calculates the math expressions received from the clients
 def calculate_expression(message):
@@ -35,7 +47,7 @@ def calculate_expression(message):
     op_list = []   # list of operators
     final_result = 0
     start = 0  # placeholder 
-    operators = set("+-*/")
+    operators = set("+-*/^")
     message = message.replace(" ", "") # take out spaces
     negative = 1.0 # multiplier for negative values
 
@@ -60,7 +72,17 @@ def calculate_expression(message):
             op_list.append(message[i])  #add operator to operator list
             start = i+1     # increment placeholder     
             negative = 1.0  # next term is positive        
-
+    # Exponent Calculations
+    for i in range(len(op_list)):
+        if op_list[i] == '^':
+            term_list[i+1]=power(float(term_list[i]),float(term_list[i+1]))
+            term_list[i] = None  # replace first multiplicand with null value
+    # delete performed operations/terms        
+    while '^' in op_list:     # remove ^
+        op_list.remove('^')
+    while None in term_list:  # remove nulls
+        term_list.remove(None)
+        
     # Multiplication Calculations
     for i in range(len(op_list)):
         if op_list[i] == '*':
@@ -90,7 +112,6 @@ def calculate_expression(message):
         if op_list[i] == '-':
             term_list[i+1]=float(term_list[i])-float(term_list[i+1])
     final_result = term_list[-1]
-        
     return final_result 
 
 # Network Connection
@@ -99,9 +120,9 @@ serverSocket=socket(AF_INET,SOCK_STREAM)
 serverSocket.bind(('',serverPort)) # bind socket to server address
 serverSocket.listen(1)  # listen for incoming connections
 print("Server is ready")
-#connectionSocket,address=serverSocket.accept()
 while True:
     connectionSocket,address=serverSocket.accept() # should this be outside loop so we can close connection at end?
+    print("Connected to :", address[0], ":", address[1])
     try:
         while True:
             message = connectionSocket.recv(4096).decode()
